@@ -2,6 +2,7 @@ package com.crafts.profileconsumer.producer;
 
 import com.crafts.profileconsumer.config.props.KafkaPropsConfig;
 import com.crafts.profileconsumer.exception.KafkaProcessingException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
@@ -25,6 +26,7 @@ public class UserProfileValidationResultKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    @Retry(name = "kafka-producer-retry", fallbackMethod = "sendFallback")
     public <T> void send(String message, String eventType, String key) throws KafkaProcessingException {
         String userProfileValidationResultTopic = kafkaPropsConfig.getUserProfileValidationResultTopic();
         if (null == userProfileValidationResultTopic) {
@@ -41,5 +43,10 @@ public class UserProfileValidationResultKafkaProducer {
             log.info("Exception in message to Topic: {}, Event type {}", userProfileValidationResultTopic, eventType);
             throw new KafkaProcessingException("Error while sending message to :" + userProfileValidationResultTopic, e);
         }
+    }
+
+    // Fallback method
+    public <T> void sendFallback(String message, String eventType, String key, Exception e) {
+        log.error("Failed to send message after validation for userId: {}. Reason: {}", key, e.getMessage());
     }
 }

@@ -36,7 +36,7 @@ public class UserProfileValidationServiceImpl implements UserProfileValidationSe
     private final ReactiveCircuitBreakerFactory<?, ?> cbFactory;
 
 
-    public UserProfileValidationServiceImpl(WebClient.Builder webClientBuilder, UserProfileValidationResultKafkaProducer userProfileValidationResultKafkaProducer, ProductRegistryServiceImpl productRegistryService, ReactiveCircuitBreakerFactory cbFactory) {
+    public UserProfileValidationServiceImpl(WebClient.Builder webClientBuilder, UserProfileValidationResultKafkaProducer userProfileValidationResultKafkaProducer, ProductRegistryServiceImpl productRegistryService, ReactiveCircuitBreakerFactory<?, ?> cbFactory) {
         this.webClient = webClientBuilder.build();  // no base URI set
         this.userProfileValidationResultKafkaProducer = userProfileValidationResultKafkaProducer;
         this.productRegistryService = productRegistryService;
@@ -108,7 +108,7 @@ public class UserProfileValidationServiceImpl implements UserProfileValidationSe
                 })
                 .transform(it -> // The circuit breaker will now only deal with non-400 exceptions
                         cbFactory.create("validate-endpoint")
-                        .run(it, Mono::error))
+                                .run(it, Mono::error))
                 .toFuture();  // Convert Mono to CompletableFuture
     }
 
@@ -127,7 +127,7 @@ public class UserProfileValidationServiceImpl implements UserProfileValidationSe
             log.error("User profile update failed for userId {} due to unexpected error.", userProfileDTO.getUserId(), e);
             userProfileDTO.setConsolidatedStatus(ValidationStatusEnum.NOT_COMPLETE.getStatus()); // fallback
             userProfileDTO.setConsolidatedMessage("Could not perform profile validation due to some unexpected error from a subscribed product.");
-            if(userProfileDTO.isCreateFlow()){
+            if (userProfileDTO.isCreateFlow()) {
                 userProfileDTO.setSubscriptions(new ArrayList<>());
             }
             sendMessageToKafka(userProfileDTO, "VALIDATION_NOT_COMPLETE");
@@ -170,7 +170,7 @@ public class UserProfileValidationServiceImpl implements UserProfileValidationSe
 
     private static UserProfileDTO getFailureUserProfileDTO(UserProfileDTO userProfileDTO) {
         UserProfileDTO rejectedUserProfileDTO = new UserProfileDTO();
-        if(userProfileDTO.isCreateFlow()){
+        if (userProfileDTO.isCreateFlow()) {
             rejectedUserProfileDTO.setSubscriptions(new ArrayList<>());
         }
         rejectedUserProfileDTO.setUserId(userProfileDTO.getUserId());
