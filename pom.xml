@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.crafts</groupId>
-	<artifactId>profile-service</artifactId>
+	<artifactId>profile-consumer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>profile-service</name>
-	<description>Handle CRUD operation of user profiles</description>
+	<name>profile-consumer</name>
+	<description>Performs validations on user profile</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
