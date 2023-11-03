@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -18,11 +17,11 @@ import java.util.List;
 @Component
 @Slf4j
 public class UserProfileValidationResultKafkaProducer {
-    @Autowired
-    private KafkaPropsConfig kafkaPropsConfig;
+    private final KafkaPropsConfig kafkaPropsConfig;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public UserProfileValidationResultKafkaProducer(@Qualifier("userProfileValidationResultKafkaTemplate") KafkaTemplate<String, String> kafkaTemplate) {
+    public UserProfileValidationResultKafkaProducer(KafkaPropsConfig kafkaPropsConfig, @Qualifier("userProfileValidationResultKafkaTemplate") KafkaTemplate<String, String> kafkaTemplate) {
+        this.kafkaPropsConfig = kafkaPropsConfig;
         this.kafkaTemplate = kafkaTemplate;
     }
 
